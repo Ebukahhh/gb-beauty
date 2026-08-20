@@ -7,38 +7,12 @@ const ArrowUpRight = () => (
   </svg>
 )
 
-const IconFacial = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-    <circle cx="12" cy="12" r="9" />
-    <path d="M9 10c0-1.5 3-1.5 3 0M15 10c0-1.5-3-1.5-3 0" />
-    <path d="M8 15c1.2 1.3 6.8 1.3 8 0" />
-  </svg>
-)
-const IconMassage = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-    <path d="M11 11V6a2 2 0 1 0-4 0v7" />
-    <path d="M7 13V9a2 2 0 1 0-4 0v6a7 7 0 0 0 7 7h2a7 7 0 0 0 7-7v-3a2 2 0 1 0-4 0" />
-    <path d="M15 12V6a2 2 0 1 1 4 0v7" />
-  </svg>
-)
-const IconWax = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-    <path d="M12 3c4 3 6 6.5 6 10a6 6 0 0 1-12 0c0-3.5 2-7 6-10z" />
-  </svg>
-)
-const IconScrub = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
-  </svg>
-)
-
 const services = [
-  { key: 'facials', eyebrow: 'Skin Rituals',     name: 'Facials',                        image: '/svc-facial.jpg' },
-  { key: 'massage',  eyebrow: 'Signature Focus',  name: 'Massages',                       image: '/svc-massage.jpg' },
-  { key: 'wax',      eyebrow: 'Smooth & Flawless', name: 'Waxing',                        icon: <IconWax /> },
-  { key: 'scrub',    eyebrow: 'Glow Treatment',   name: 'Body Scrub',                     image: '/svc-scrub.jpg' },
-  { key: 'gems',     eyebrow: 'Smile Styling',    name: 'Fashion Braces & Tooth Gems',    image: '/svc-gems.jpg' },
+  { key: 'facials', eyebrow: 'Skin Rituals',      name: 'Facials',                     image: '/svc-facial.jpg' },
+  { key: 'massage', eyebrow: 'Signature Focus',   name: 'Massages',                    image: '/svc-massage.jpg' },
+  { key: 'wax',     eyebrow: 'Smooth & Flawless', name: 'Waxing',                      image: '/svc-wax.jpg', objectPosition: '78% 50%' },
+  { key: 'scrub',   eyebrow: 'Glow Treatment',    name: 'Body Scrub',                  image: '/svc-scrub.jpg' },
+  { key: 'gems',    eyebrow: 'Smile Styling',     name: 'Fashion Braces & Tooth Gems', image: '/svc-gems.jpg' },
 ]
 
 function getVis() {
@@ -112,14 +86,13 @@ export default function Services() {
             <div className="svc-track" ref={trackRef}>
               {services.map((s) => (
                 <a key={s.key} href="#booking" className="svc-card">
-                  {s.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.image} alt={s.name} className="svc-card-bg" />
-                  ) : (
-                    <div className="svc-card-bg gradient" style={{ background: 'linear-gradient(155deg, var(--brown-3) 0%, var(--rust-dk) 130%)', color: 'var(--rust-lt)' }}>
-                      {s.icon}
-                    </div>
-                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={s.image}
+                    alt={s.name}
+                    className="svc-card-bg"
+                    style={s.objectPosition ? { objectPosition: s.objectPosition } : undefined}
+                  />
                   <div className="svc-card-scrim"></div>
                   <span className="svc-arrow-btn"><ArrowUpRight /></span>
                   <div className="svc-card-text">

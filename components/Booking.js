@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 
 const TIMES = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM']
 const THERAPIST_TYPES = ['Chubby', 'Petite', 'Dark Skin', 'Light Skin', 'Slim']
-const SPA_WHATSAPP = '2340000000000'
+const SPA_WHATSAPP = '2349078333003'
 const BANK_DETAILS = { name: 'GB SPA', account: '1229766614', bank: 'Zenith Bank' }
 
 export default function Booking() {
