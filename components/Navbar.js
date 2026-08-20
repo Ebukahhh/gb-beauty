@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 const LINKS = [
   { href: '#about',        label: 'About' },
   { href: '#services',     label: 'Services' },
-  { href: '#team',         label: 'Team' },
   { href: '#testimonials', label: 'Reviews' },
   { href: '#contact',      label: 'Contact' },
 ]
@@ -18,19 +17,21 @@ export default function Navbar() {
   const onScroll = useCallback(() => {
     const y = window.scrollY
     setScrolled(y > 60)
-    if (y > 60) {
-      const el  = document.elementFromPoint(window.innerWidth / 2, 90)
-      const sec = el?.closest('section, .ticker, footer')
-      const light = sec?.classList.contains('section-light') || sec?.classList.contains('section-beige')
-      setOnLight(!!light)
+
+    let cur = ''
+    let curEl = null
+    document.querySelectorAll('section[id], footer').forEach(s => {
+      if (y + 100 >= s.offsetTop) { curEl = s }
+      if (s.id && y + 100 >= s.offsetTop) cur = s.id
+    })
+    setActive(cur)
+
+    if (y > 60 && curEl) {
+      const light = curEl.classList.contains('section-light') || curEl.classList.contains('section-beige')
+      setOnLight(light)
     } else {
       setOnLight(false)
     }
-    let cur = ''
-    document.querySelectorAll('section[id]').forEach(s => {
-      if (y + 100 >= s.offsetTop) cur = s.id
-    })
-    setActive(cur)
   }, [])
 
   useEffect(() => {

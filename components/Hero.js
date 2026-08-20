@@ -30,7 +30,7 @@ export default function Hero() {
             </div>
             <div className="hero-stats-text">
               <div className="hero-stars">★★★★★ 4.9</div>
-              <div className="hero-stats-label"><strong>500+</strong> Happy Clients</div>
+              <div className="hero-stats-label"><strong>150+</strong> Happy Clients</div>
             </div>
           </div>
         </div>

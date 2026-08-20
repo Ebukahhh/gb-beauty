@@ -82,6 +82,7 @@ function getVis() {
 export default function Services() {
   const [slide, setSlide] = useState(0)
   const trackRef = useRef(null)
+  const timerRef = useRef(null)
 
   const applySlide = useCallback((idx) => {
     if (!trackRef.current) return
@@ -91,19 +92,31 @@ export default function Services() {
     trackRef.current.style.transform = `translateX(-${idx * w}px)`
   }, [])
 
-  const go = useCallback((idx) => {
+  const go = useCallback((idx, restartTimer = true) => {
     const v = getVis()
     const m = Math.max(0, services.length - v)
-    const next = Math.max(0, Math.min(idx, m))
+    const next = ((idx % (m + 1)) + (m + 1)) % (m + 1)
     setSlide(next)
     applySlide(next)
+    if (restartTimer) {
+      clearInterval(timerRef.current)
+      timerRef.current = setInterval(() => {
+        setSlide(s => {
+          const vv = getVis()
+          const mm = Math.max(0, services.length - vv)
+          const n = s >= mm ? 0 : s + 1
+          applySlide(n)
+          return n
+        })
+      }, 4500)
+    }
   }, [applySlide])
 
   useEffect(() => {
     go(0)
-    const onResize = () => go(slide)
+    const onResize = () => go(slide, false)
     window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
+    return () => { clearInterval(timerRef.current); window.removeEventListener('resize', onResize) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -122,7 +135,21 @@ export default function Services() {
               Every treatment is designed with precision and care, using only the finest products to ensure
               your complete satisfaction.
             </p>
-            <a href="#booking" className="btn btn-outline-d btn-sm">Explore Treatments</a>
+            <div className="svc-header-row">
+              <a href="#booking" className="btn btn-outline-d btn-sm">Explore Treatments</a>
+              <div className="testi-nav">
+                <button className="tn-btn on-dark" onClick={() => go(slide - 1)} aria-label="Previous treatment">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button className="tn-btn on-dark" onClick={() => go(slide + 1)} aria-label="Next treatment">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

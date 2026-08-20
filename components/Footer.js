@@ -27,7 +27,7 @@ export default function Footer() {
             <div className="f-col">
               <h5>Navigate</h5>
               <ul>
-                {['about','services','team','testimonials','booking','contact'].map(s => (
+                {['about','services','testimonials','booking','contact'].map(s => (
                   <li key={s}><a href={`#${s}`} style={{ textTransform: 'capitalize' }}>{s === 'booking' ? 'Book Now' : s}</a></li>
                 ))}
               </ul>
