@@ -33,10 +33,11 @@ function getVis() {
 
 export default function Testimonials() {
   const [slide, setSlide] = useState(0)
+  // Initialized to match the server's window-less getVis() fallback (3) so the
+  // first client render's dot count agrees with SSR — real value is set post-mount.
+  const [totalDots, setTotalDots] = useState(Math.max(0, REVIEWS.length - 3) + 1)
   const trackRef = useRef(null)
   const timerRef = useRef(null)
-
-  const max = REVIEWS.length - getVis()
 
   const applySlide = useCallback((idx) => {
     if (!trackRef.current) return
@@ -64,13 +65,16 @@ export default function Testimonials() {
   }, [applySlide])
 
   useEffect(() => {
+    setTotalDots(Math.max(0, REVIEWS.length - getVis()) + 1)
     go(0)
-    const onResize = () => { setSlide(0); applySlide(0) }
+    const onResize = () => {
+      setTotalDots(Math.max(0, REVIEWS.length - getVis()) + 1)
+      setSlide(0)
+      applySlide(0)
+    }
     window.addEventListener('resize', onResize)
     return () => { clearInterval(timerRef.current); window.removeEventListener('resize', onResize) }
   }, [go, applySlide])
-
-  const totalDots = Math.max(0, REVIEWS.length - getVis()) + 1
 
   return (
     <section className="testimonials section-light" id="testimonials">
