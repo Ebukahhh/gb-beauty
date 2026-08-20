@@ -1,20 +1,39 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const TIMES = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM']
+const THERAPIST_TYPES = ['Chubby', 'Petite', 'Dark Skin', 'Light Skin', 'Slim']
+const SPA_WHATSAPP = '2340000000000'
+const BANK_DETAILS = { name: 'GB SPA', account: '1229766614', bank: 'Zenith Bank' }
 
 export default function Booking() {
-  const [success, setSuccess] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [dateMin, setDateMin]  = useState('')
+  const [success, setSuccess]   = useState(false)
+  const [loading, setLoading]   = useState(false)
+  const [dateMin, setDateMin]   = useState('')
+  const [service, setService]   = useState('')
+  const [therapistTypes, setTherapistTypes] = useState([])
+  const [otherTherapist, setOtherTherapist] = useState('')
+  const [receiptFile, setReceiptFile] = useState(null)
+  const [formError, setFormError] = useState('')
+  const [waLink, setWaLink] = useState('')
+  const formRef = useRef(null)
+
+  const isMassage = service === 'massage'
 
   useEffect(() => {
     const t = new Date()
     setDateMin(`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`)
   }, [])
 
-  function handleSubmit(e) {
+  function toggleTherapistType(type) {
+    setTherapistTypes(prev => prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type])
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault()
+    setFormError('')
+
+    const data = new FormData(e.target)
     let valid = true
     e.target.querySelectorAll('[required]').forEach(f => {
       if (!f.value.trim()) {
@@ -23,14 +42,63 @@ export default function Booking() {
         f.addEventListener('input', () => { f.style.borderColor = '' }, { once: true })
       }
     })
+    if (isMassage && therapistTypes.length === 0 && !otherTherapist.trim()) {
+      valid = false
+      setFormError('Please select a preferred therapist type (or specify one).')
+    }
+    if (isMassage && !receiptFile) {
+      valid = false
+      setFormError('Please upload your payment receipt to continue.')
+    }
     if (!valid) return
+
     setLoading(true)
-    setTimeout(() => {
+    try {
+      let receiptUrl = ''
+      if (isMassage && receiptFile) {
+        const fd = new FormData()
+        fd.append('file', receiptFile)
+        const res = await fetch('/api/upload', { method: 'POST', body: fd })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Upload failed')
+        receiptUrl = json.url
+      }
+
+      const lines = [
+        'New Booking Request — GB Beauty Spa',
+        `Name: ${data.get('firstName')} ${data.get('lastName')}`,
+        `Phone: ${data.get('phone')}`,
+        `Email: ${data.get('email')}`,
+        `Service: ${e.target.service.selectedOptions[0]?.text || data.get('service')}`,
+        `Location: ${data.get('location')}`,
+        `Date: ${data.get('date')}`,
+        `Time: ${data.get('time')}`,
+      ]
+      if (isMassage) {
+        const prefs = [...therapistTypes, otherTherapist.trim()].filter(Boolean).join(', ')
+        lines.push(`Preferred Therapist Type: ${prefs}`)
+        lines.push(`Payment Reference: ${data.get('paymentRef') || '—'}`)
+        if (receiptUrl) lines.push(`Payment Receipt: ${receiptUrl}`)
+      }
+      if (data.get('notes')) lines.push(`Notes: ${data.get('notes')}`)
+
+      const text = encodeURIComponent(lines.join('\n'))
+      const link = `https://wa.me/${SPA_WHATSAPP}?text=${text}`
+      setWaLink(link)
+      window.open(link, '_blank', 'noopener')
+
       e.target.reset()
+      setService('')
+      setTherapistTypes([])
+      setOtherTherapist('')
+      setReceiptFile(null)
       setLoading(false)
       setSuccess(true)
-      setTimeout(() => setSuccess(false), 9000)
-    }, 1200)
+      setTimeout(() => setSuccess(false), 15000)
+    } catch (err) {
+      setLoading(false)
+      setFormError(err.message || 'Something went wrong. Please try again.')
+    }
   }
 
   return (
@@ -38,7 +106,7 @@ export default function Booking() {
       <div className="container">
         <div className="booking-grid">
           <div className="booking-form-card reveal">
-            <form className="booking-form" onSubmit={handleSubmit} noValidate>
+            <form className="booking-form" ref={formRef} onSubmit={handleSubmit} noValidate>
               <div className="f-row">
                 <div className="f-group">
                   <label htmlFor="firstName">First Name</label>
@@ -60,13 +128,19 @@ export default function Booking() {
                 </div>
               </div>
               <div className="f-group">
+                <label htmlFor="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="e.g. Lagos, Abuja, Port Harcourt…" required />
+              </div>
+              <div className="f-group">
                 <label htmlFor="service">Service</label>
-                <select id="service" name="service" required defaultValue="">
+                <select id="service" name="service" required value={service} onChange={e => setService(e.target.value)}>
                   <option value="" disabled>Choose a service…</option>
                   <option value="facial">Facial Treatment</option>
                   <option value="massage">Massage Therapy</option>
                   <option value="wax">Waxing</option>
                   <option value="scrub">Body Scrub</option>
+                  <option value="manicure">Manicure</option>
+                  <option value="pedicure">Pedicure</option>
                   <option value="fashion-braces">Fashion Braces</option>
                   <option value="tooth-gems">Tooth Gems</option>
                 </select>
@@ -84,6 +158,63 @@ export default function Booking() {
                   </select>
                 </div>
               </div>
+
+              {isMassage && (
+                <div className="f-massage-block">
+                  <div className="f-group">
+                    <label>Preferred Therapist Type</label>
+                    <div className="f-checks">
+                      {THERAPIST_TYPES.map(type => (
+                        <label key={type} className="f-check">
+                          <input
+                            type="checkbox"
+                            checked={therapistTypes.includes(type)}
+                            onChange={() => toggleTherapistType(type)}
+                          />
+                          {type}
+                        </label>
+                      ))}
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Other (optional)"
+                      value={otherTherapist}
+                      onChange={e => setOtherTherapist(e.target.value)}
+                      style={{ marginTop: 8 }}
+                    />
+                  </div>
+
+                  <div className="deposit-box">
+                    <div className="deposit-title">50% deposit required to confirm booking</div>
+                    <div className="deposit-detail">
+                      Pay into: <strong>{BANK_DETAILS.name}</strong> · {BANK_DETAILS.account} · {BANK_DETAILS.bank}
+                    </div>
+
+                    <div className="f-group" style={{ marginTop: 14 }}>
+                      <label htmlFor="paymentRef">Payment Reference / Name Used for Transfer</label>
+                      <input type="text" id="paymentRef" name="paymentRef" placeholder="e.g. your name or transaction ID" required />
+                    </div>
+
+                    <div className="f-group" style={{ marginTop: 14 }}>
+                      <label htmlFor="receipt">Upload Payment Receipt (image or PDF, max 10MB)</label>
+                      <label htmlFor="receipt" className="file-drop">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                        </svg>
+                        {receiptFile ? receiptFile.name : 'Add File'}
+                      </label>
+                      <input
+                        type="file"
+                        id="receipt"
+                        accept="image/*,.pdf"
+                        style={{ display: 'none' }}
+                        onChange={e => setReceiptFile(e.target.files?.[0] || null)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="f-group">
                 <label htmlFor="notes">
                   Notes{' '}
@@ -93,12 +224,15 @@ export default function Booking() {
                 </label>
                 <textarea id="notes" name="notes" rows={3} placeholder="Special requests or skin concerns…" />
               </div>
+
+              {formError && <div className="f-error">{formError}</div>}
+
               <button
                 type="submit"
                 className="btn btn-rust btn-full"
                 disabled={loading}
               >
-                {loading ? 'Sending…' : 'Request Appointment'}
+                {loading ? 'Sending…' : 'Request Appointment via WhatsApp'}
               </button>
               {success && (
                 <div className="f-success show">
@@ -106,7 +240,10 @@ export default function Booking() {
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
-                  <p>Your appointment request has been received! We&apos;ll confirm within 24 hours.</p>
+                  <p>
+                    We&apos;ve opened WhatsApp with your booking details — just hit send to confirm with us.{' '}
+                    {waLink && <a href={waLink} target="_blank" rel="noopener noreferrer">Didn&apos;t open? Click here.</a>}
+                  </p>
                 </div>
               )}
             </form>
