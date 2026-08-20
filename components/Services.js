@@ -32,19 +32,13 @@ const IconScrub = () => (
     <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
   </svg>
 )
-const IconGem = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-    <path d="M6 3h12l4 6-10 12L2 9z" />
-    <path d="M2 9h20M9 3l3 6-3 12M15 3l-3 6 3 12" />
-  </svg>
-)
 
 const services = [
   { key: 'facials', eyebrow: 'Skin Rituals',     name: 'Facials',                        image: '/svc-facial.jpg' },
   { key: 'massage',  eyebrow: 'Signature Focus',  name: 'Massages',                       image: '/svc-massage.jpg' },
   { key: 'wax',      eyebrow: 'Smooth & Flawless', name: 'Waxing',                        icon: <IconWax /> },
   { key: 'scrub',    eyebrow: 'Glow Treatment',   name: 'Body Scrub',                     image: '/svc-scrub.jpg' },
-  { key: 'gems',     eyebrow: 'Smile Styling',    name: 'Fashion Braces & Tooth Gems',    icon: <IconGem /> },
+  { key: 'gems',     eyebrow: 'Smile Styling',    name: 'Fashion Braces & Tooth Gems',    image: '/svc-gems.jpg' },
 ]
 
 function getVis() {
