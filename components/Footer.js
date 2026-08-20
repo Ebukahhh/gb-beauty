@@ -23,7 +23,7 @@ const SOCIALS = [
 export default function Footer() {
   return (
     <footer className="footer">
-      <div className="container">
+      <div className="footer-wrap">
         <div className="footer-card">
           <svg className="footer-flourish" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
             <path d="M12 2c1.5 3 3 4.5 6 6-3 1.5-4.5 3-6 6-1.5-3-3-4.5-6-6 3-1.5 4.5-3 6-6z" />

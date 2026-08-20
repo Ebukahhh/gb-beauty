@@ -1086,6 +1086,8 @@ section { padding: 110px 0; }
    ============================================ */
 .footer { background: var(--cream); padding: 0 0 60px; }
 
+.footer-wrap { padding: 0 24px; }
+
 .footer-card {
   position: relative;
   overflow: hidden;
