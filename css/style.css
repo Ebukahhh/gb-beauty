@@ -1084,16 +1084,14 @@ section { padding: 110px 0; }
 /* ============================================
    FOOTER
    ============================================ */
-.footer { background: var(--cream); padding: 0 0 60px; }
+.footer { background: #fff; }
 
-.footer-wrap { padding: 0 24px; }
+.footer-wrap { padding: 0; }
 
 .footer-card {
   position: relative;
   overflow: hidden;
   background: #fff;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
   padding: 48px 52px 28px;
 }
 
