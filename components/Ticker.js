@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 
 const items = [
-  'Facials', 'Massages', 'Waxing', 'Body Scrubs',
+  'Facials', 'Massages', 'Waxing', 'Body Scrubs', 'Manicure', 'Pedicure',
   'Fashion Braces', 'Tooth Gems', 'GB Beauty Spa — Lagos',
 ]
 
